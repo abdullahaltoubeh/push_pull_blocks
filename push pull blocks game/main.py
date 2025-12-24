@@ -1,5 +1,5 @@
 from solver import dfs, bfs_solve, ucs_solve
-from manual import play_manual
+from manual import play_manual, replay_moves
 from levels import get_levels
 from board_utils import copy_board
 def main():
@@ -21,8 +21,9 @@ def main():
     print("2) Auto solve DFS")
     print("3) Auto solve BFS")
     print("4) Auto solve UCS")
+    print("5) Replay level 2 manual solution")
 
-    choice = input("Choose 1 or 2 or 3 or 4: ")
+    choice = input("Choose 1 or 2 or 3 or 4 ")
 
     if choice == "1":
         play_manual(board)
@@ -35,6 +36,13 @@ def main():
 
     elif choice == "4":
         ucs_solve(board)
+
+    elif choice == "5":
+        if level_choice != 2:
+            print("Replay is currently configured for level 2 only.")
+            return
+        moves = [(3, 0), (3, 0), (0, 0), (2, 0), (0, 2), (3, 2)]
+        replay_moves(board, moves)
 
     else:
         print("Invalid choice.")
