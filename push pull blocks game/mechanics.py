@@ -1,5 +1,6 @@
 from board_utils import in_bounds, DIRS
 
+
 def push_chain(board, chain, dr, dc):
     rows, cols = len(board), len(board[0])
 
@@ -21,33 +22,50 @@ def push_chain(board, chain, dr, dc):
 
     return True
 
+
+
+# ---------------------------------------------
+# Activate device
+# ---------------------------------------------
 def activate_device(board, r, c):
     device = board[r][c]
     if device not in DIRS:
         return False, "Cell does not contain a device."
 
-    dr, dc = DIRS[device]
     rows, cols = len(board), len(board[0])
 
-    cur_r = r + dr
-    cur_c = c + dc
+    moved = False
 
-    while in_bounds(cur_r, cur_c, rows, cols) and board[cur_r][cur_c] not in ['O', 'o']:
-        if board[cur_r][cur_c] not in ['0', 'T', '<', '>', '^', 'v']:
-            return False, "No block in that direction."
-        cur_r += dr
-        cur_c += dc
+    # 🔑 دعم اتجاه واحد أو عدة اتجاهات
+    for dr, dc in DIRS[device]:
 
-    if not in_bounds(cur_r, cur_c, rows, cols):
-        return False, "No block found."
+        cur_r = r + dr
+        cur_c = c + dc
 
-    chain = []
-    while in_bounds(cur_r, cur_c, rows, cols) and board[cur_r][cur_c] in ['O', 'o']:
-        chain.append((cur_r, cur_c))
-        cur_r += dr
-        cur_c += dc
+        # تخطي الفراغات والأجهزة
+        while in_bounds(cur_r, cur_c, rows, cols) and board[cur_r][cur_c] not in ['O', 'o']:
+            if board[cur_r][cur_c] not in ['0', 'T', '<', '>', '^', 'v', '└']:
+                break
+            cur_r += dr
+            cur_c += dc
 
-    if not push_chain(board, chain, dr, dc):
-        return False, "Cannot push."
+        if not in_bounds(cur_r, cur_c, rows, cols):
+            continue
 
-    return True, "Push successful."
+        # جمع السلسلة
+        chain = []
+        while in_bounds(cur_r, cur_c, rows, cols) and board[cur_r][cur_c] in ['O', 'o']:
+            chain.append((cur_r, cur_c))
+            cur_r += dr
+            cur_c += dc
+
+        if not chain:
+            continue
+
+        if push_chain(board, chain, dr, dc):
+            moved = True
+
+    if moved:
+        return True, "Push successful."
+
+    return False, "Cannot push."
